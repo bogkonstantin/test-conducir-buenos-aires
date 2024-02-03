@@ -1,5 +1,5 @@
 import * as React from "react";
-import {getTranslation} from "../questions/questions";
+import {getTranslation} from "../questions/translations";
 
 const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
     return (
