@@ -1,5 +1,4 @@
 import * as React from "react"
-import Container from "./Container";
 import QuestionText from "./QuestionText";
 import Header from "./Header";
 import Answers from "./Answers";
@@ -49,14 +48,14 @@ const Test = ({questions, postfix}) => {
 
     if (!state.queue.length) {
         return (
-            <Container>
+            <>
                 <div className="mb-5">Ты все выучил, поздравляю!</div>
                 <button
                     onClick={() => updateState(getInitialState())}
                     className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded mb-5">
                     Сбросить
                 </button>
-            </Container>
+            </>
         );
     }
 
@@ -64,58 +63,56 @@ const Test = ({questions, postfix}) => {
 
     return (
         <>
-            <Container>
-                <Header number={Number(state.index) + 1}
-                        language={state.language}
-                        onUpdateLang={(value) => updateState({language: value})}
-                        stat={{...state.stat, queued: state.queue.length}}
-                />
-                <QuestionText question={question}
-                              language={state.language}/>
 
-                <Answers responses={question.responses}
-                         language={state.language}
-                         isAnswered={state.isAnswered}
-                         selected={state.selectedAnswer}
-                         onSelect={(i) => !state.isAnswered && updateState({selectedAnswer: i})}/>
+            <Header number={Number(state.index) + 1}
+                    language={state.language}
+                    onUpdateLang={(value) => updateState({language: value})}
+                    stat={{...state.stat, queued: state.queue.length}}
+            />
+            <QuestionText question={question}
+                          language={state.language}/>
 
-                <ControlButtons isAnswered={state.isAnswered}
-                                selected={state.selectedAnswer}
-                                onAnswer={() => {
-                                    let stat = {...state.stat};
-                                    let queue = [...state.queue];
-                                    if (!stat.questions[state.index]) {
-                                        stat.questions[state.index] = 0;
-                                    }
+            <Answers responses={question.responses}
+                     language={state.language}
+                     isAnswered={state.isAnswered}
+                     selected={state.selectedAnswer}
+                     onSelect={(i) => !state.isAnswered && updateState({selectedAnswer: i})}/>
 
-                                    if (question.responses[state.selectedAnswer].correct) {
-                                        stat.questions[state.index]++;
-                                    } else {
-                                        stat.questions[state.index] = 0;
-                                    }
+            <ControlButtons isAnswered={state.isAnswered}
+                            selected={state.selectedAnswer}
+                            onAnswer={() => {
+                                let stat = {...state.stat};
+                                let queue = [...state.queue];
+                                if (!stat.questions[state.index]) {
+                                    stat.questions[state.index] = 0;
+                                }
 
-                                    if (stat.questions[state.index] > 3) {
-                                        delete stat.questions[state.index];
-                                        queue.splice(queue.indexOf(String(state.index)), 1);
-                                    }
+                                if (question.responses[state.selectedAnswer].correct) {
+                                    stat.questions[state.index]++;
+                                } else {
+                                    stat.questions[state.index] = 0;
+                                }
 
-                                    updateState({
-                                        isAnswered: true,
-                                        stat: stat,
-                                        queue: queue,
-                                    });
-                                }}
+                                if (stat.questions[state.index] > 3) {
+                                    delete stat.questions[state.index];
+                                    queue.splice(queue.indexOf(String(state.index)), 1);
+                                }
 
-                                onNext={() => {
-                                    const index = state.queue.length ? state.queue[Math.floor(Math.random() * state.queue.length)] : null;
-                                    updateState({
-                                        index: index,
-                                        selectedAnswer: null,
-                                        isAnswered: false,
-                                    });
-                                }}/>
+                                updateState({
+                                    isAnswered: true,
+                                    stat: stat,
+                                    queue: queue,
+                                });
+                            }}
 
-            </Container>
+                            onNext={() => {
+                                const index = state.queue.length ? state.queue[Math.floor(Math.random() * state.queue.length)] : null;
+                                updateState({
+                                    index: index,
+                                    selectedAnswer: null,
+                                    isAnswered: false,
+                                });
+                            }}/>
         </>
     )
 }
