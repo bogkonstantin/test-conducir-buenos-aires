@@ -7,6 +7,7 @@ import { getLanguageFromStorage } from "../../lib/language";
 import { normalizeLocale } from "../../lib/i18n";
 import { update as updateMastery } from "../../lib/mastery";
 import { pickWeak } from "../../lib/selection";
+import { t } from "../../lib/ui";
 
 const Test = ({questions, postfix}) => {
 
@@ -51,24 +52,77 @@ const Test = ({questions, postfix}) => {
         _setState(newStateMerged);
     }
 
-    if (!state.queue.length) {
+    const done = !state.queue.length;
+    const question = done ? null : questions[state.index];
+
+    const handleSelect = (i) => {
+        if (!state.isAnswered) updateState({selectedAnswer: i});
+    };
+
+    const handleAnswer = () => {
+        if (state.isAnswered || state.selectedAnswer === null) return;
+
+        let stat = {...state.stat};
+        let queue = [...state.queue];
+        const correct = question.responses[state.selectedAnswer].correct;
+
+        if (!stat.questions[state.index]) {
+            stat.questions[state.index] = 0;
+        }
+
+        if (correct) {
+            stat.questions[state.index]++;
+        } else {
+            stat.questions[state.index] = 0;
+        }
+
+        if (stat.questions[state.index] > 3) {
+            delete stat.questions[state.index];
+            queue.splice(queue.indexOf(String(state.index)), 1);
+        }
+
+        const mastery = {...(state.mastery || {})};
+        mastery[state.index] = updateMastery(mastery[state.index], question, correct, Date.now());
+
+        updateState({ isAnswered: true, stat, queue, mastery });
+    };
+
+    const handleNext = () => {
+        const index = pickWeak(state.queue, questions, state.mastery, Date.now());
+        updateState({ index, selectedAnswer: null, isAnswered: false });
+    };
+
+    // Keyboard: 1..9 pick an answer, Enter checks then advances.
+    React.useEffect(() => {
+        const onKey = (e) => {
+            if (done) return;
+            if (/^[1-9]$/.test(e.key)) {
+                const i = Number(e.key) - 1;
+                if (!state.isAnswered && i < question.responses.length) handleSelect(i);
+            } else if (e.key === 'Enter') {
+                if (state.isAnswered) handleNext();
+                else handleAnswer();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    });
+
+    if (done) {
         return (
             <>
-                <div className="mb-5">Ты все выучил, поздравляю!</div>
+                <div className="mb-5">{t('allLearned')}</div>
                 <button
                     onClick={() => updateState(getInitialState())}
                     className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded mb-5">
-                    Сбросить
+                    {t('reset')}
                 </button>
             </>
         );
     }
 
-    const question = questions[state.index];
-
     return (
         <>
-
             <Header number={Number(state.index) + 1}
                     language={state.language}
                     onUpdateLang={(value) => updateState({language: value})}
@@ -81,49 +135,12 @@ const Test = ({questions, postfix}) => {
                      language={state.language}
                      isAnswered={state.isAnswered}
                      selected={state.selectedAnswer}
-                     onSelect={(i) => !state.isAnswered && updateState({selectedAnswer: i})}/>
+                     onSelect={handleSelect}/>
 
             <ControlButtons isAnswered={state.isAnswered}
                             selected={state.selectedAnswer}
-                            onAnswer={() => {
-                                let stat = {...state.stat};
-                                let queue = [...state.queue];
-                                const correct = question.responses[state.selectedAnswer].correct;
-
-                                if (!stat.questions[state.index]) {
-                                    stat.questions[state.index] = 0;
-                                }
-
-                                if (correct) {
-                                    stat.questions[state.index]++;
-                                } else {
-                                    stat.questions[state.index] = 0;
-                                }
-
-                                if (stat.questions[state.index] > 3) {
-                                    delete stat.questions[state.index];
-                                    queue.splice(queue.indexOf(String(state.index)), 1);
-                                }
-
-                                const mastery = {...(state.mastery || {})};
-                                mastery[state.index] = updateMastery(mastery[state.index], question, correct, Date.now());
-
-                                updateState({
-                                    isAnswered: true,
-                                    stat: stat,
-                                    queue: queue,
-                                    mastery: mastery,
-                                });
-                            }}
-
-                            onNext={() => {
-                                const index = pickWeak(state.queue, questions, state.mastery, Date.now());
-                                updateState({
-                                    index: index,
-                                    selectedAnswer: null,
-                                    isAnswered: false,
-                                });
-                            }}/>
+                            onAnswer={handleAnswer}
+                            onNext={handleNext}/>
         </>
     )
 }

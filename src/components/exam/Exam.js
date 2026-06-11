@@ -69,6 +69,27 @@ const Exam = ({ questions }) => {
         return () => clearInterval(handle);
     }, [startedAt, finished, finish]);
 
+    // Keyboard: 1..9 pick an answer, arrows navigate, Enter advances / finishes.
+    React.useEffect(() => {
+        if (!ids || finished) return;
+        const onKey = (e) => {
+            const q = questions[ids[current]];
+            if (/^[1-9]$/.test(e.key)) {
+                const i = Number(e.key) - 1;
+                if (i < q.responses.length) setAnswers((a) => ({ ...a, [current]: i }));
+            } else if (e.key === "ArrowLeft") {
+                setCurrent((c) => Math.max(0, c - 1));
+            } else if (e.key === "ArrowRight") {
+                setCurrent((c) => Math.min(ids.length - 1, c + 1));
+            } else if (e.key === "Enter") {
+                if (current === ids.length - 1) finish(false);
+                else setCurrent((c) => Math.min(ids.length - 1, c + 1));
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [ids, current, finished, finish, questions]);
+
     if (!ids) {
         return <p className="text-sm text-gray-500">Preparing exam…</p>;
     }
