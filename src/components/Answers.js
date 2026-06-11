@@ -1,5 +1,5 @@
 import * as React from "react";
-import {getTranslation} from "../questions/translations";
+import {translate} from "../lib/i18n";
 
 const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
     return (
@@ -12,7 +12,7 @@ const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
                             color = "text-green-700";
                         }
                     }
-                    const isLanguageSelected = language !== "0";
+                    const tran = translate(answer, language);
 
                     return (
                         <li className="mb-4" key={index}>
@@ -27,13 +27,7 @@ const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
                                 <label htmlFor={`default-radio-${index}`}
                                        className={`ml-3 ms-2 text-sm font-medium ${color}`}>{answer.text}</label>
                             </div>
-                            {
-                                isLanguageSelected ?
-                                    <p className="text-sm mb-6 text-gray-600">
-                                        {getTranslation(answer.text)}
-                                    </p>
-                                    : (isLanguageSelected && <p className="text-sm mb-6 text-red-600">нет перевода</p>)
-                            }
+                            {tran && <p className="text-sm mb-6 text-gray-600">{tran}</p>}
                         </li>
                     );
                 })

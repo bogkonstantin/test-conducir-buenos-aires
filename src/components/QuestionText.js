@@ -1,17 +1,13 @@
 import * as React from "react"
-import {getTranslation} from "../questions/translations";
+import { translate } from "../lib/i18n";
 
 const QuestionText = ({question, language}) => {
-    const isLanguageSelected = language !== "0";
+    const tran = translate(question, language);
 
     return (
         <>
             <p className="text-xl mb-2">{question.text}</p>
-            {
-                isLanguageSelected ?
-                    <p className="text-sm text-gray-600 mb-2">{getTranslation(question.text)}</p>
-                    : isLanguageSelected && <p className="text-sm text-red-600 mb-2">нет перевода</p>
-            }
+            {tran && <p className="text-sm text-gray-600 mb-2">{tran}</p>}
             {
                 question.img ?
                     <img className="mt-6 rounded-sm" src={question.img} alt={question.text}/>
