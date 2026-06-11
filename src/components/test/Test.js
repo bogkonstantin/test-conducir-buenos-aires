@@ -5,6 +5,7 @@ import Answers from "../Answers";
 import ControlButtons from "../ControlButtons";
 import { getLanguageFromStorage } from "../../lib/language";
 import { normalizeLocale } from "../../lib/i18n";
+import { update as updateMastery } from "../../lib/mastery";
 
 const Test = ({questions, postfix}) => {
 
@@ -25,6 +26,7 @@ const Test = ({questions, postfix}) => {
                 questions: {},
                 total: questions.length,
             },
+            mastery: {},
             queue: shuffleArray(Object.keys(questions)),
         };
     }
@@ -85,11 +87,13 @@ const Test = ({questions, postfix}) => {
                             onAnswer={() => {
                                 let stat = {...state.stat};
                                 let queue = [...state.queue];
+                                const correct = question.responses[state.selectedAnswer].correct;
+
                                 if (!stat.questions[state.index]) {
                                     stat.questions[state.index] = 0;
                                 }
 
-                                if (question.responses[state.selectedAnswer].correct) {
+                                if (correct) {
                                     stat.questions[state.index]++;
                                 } else {
                                     stat.questions[state.index] = 0;
@@ -100,10 +104,14 @@ const Test = ({questions, postfix}) => {
                                     queue.splice(queue.indexOf(String(state.index)), 1);
                                 }
 
+                                const mastery = {...(state.mastery || {})};
+                                mastery[state.index] = updateMastery(mastery[state.index], question, correct, Date.now());
+
                                 updateState({
                                     isAnswered: true,
                                     stat: stat,
                                     queue: queue,
+                                    mastery: mastery,
                                 });
                             }}
 

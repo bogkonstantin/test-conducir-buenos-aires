@@ -3,6 +3,22 @@ function getKey(postfix) {
     return `state${postfix}`;
 }
 
+// The per-category storage suffix. Category B progress lives at `state_cat_b`, etc.
+function postfixFor(category) {
+    return `_cat_${String(category).toLowerCase()}`;
+}
+
+// Parsed progress object for a category, or null if absent/unreadable.
+function getProgress(category) {
+    const raw = getProgressFromStorage(postfixFor(category));
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw);
+    } catch (e) {
+        return null;
+    }
+}
+
 function getProgressFromStorage(postfix) {
     const key = getKey(postfix);
 
@@ -25,4 +41,4 @@ function saveProgressToStorage(postfix, progress) {
     }
 }
 
-export { getProgressFromStorage, saveProgressToStorage };
+export { getProgressFromStorage, saveProgressToStorage, postfixFor, getProgress };

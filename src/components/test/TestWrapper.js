@@ -2,6 +2,7 @@ import * as React from "react"
 import Test from "./Test";
 import Container from "../Container";
 import { getQuestions } from "../../lib/questions";
+import { postfixFor } from "../../lib/progress";
 
 let categoryHead = '';
 
@@ -14,7 +15,7 @@ const TestWrapper = ({ category }) => {
                 <h1>Test Conducir Buenos Aires, Category {category.toUpperCase()}</h1>
             </div>
             <br />
-            <Test questions={questions} postfix={`_cat_${category.toLowerCase()}`}></Test>
+            <Test questions={questions} postfix={postfixFor(category)}></Test>
         </Container>
     </>;
 }
