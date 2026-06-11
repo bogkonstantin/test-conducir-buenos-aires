@@ -15,7 +15,7 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
             <Container>
                 <button
                     onClick={() => onNext()}
-                    className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded">
+                    className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
                     {t('next')}
                 </button>
             </Container>
@@ -25,7 +25,7 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
     let colors = 'bg-green-700 hover:bg-green-800 text-white';
     let text = t('check');
     if (selected === null) {
-        colors = 'bg-gray-300 hover:bg-gray-400 text-black';
+        colors = 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-black';
         text = t('chooseAnswer');
     }
 

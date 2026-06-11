@@ -7,7 +7,7 @@ const QuestionText = ({question, language}) => {
     return (
         <>
             <p className="text-xl mb-2">{question.text}</p>
-            {tran && <p className="text-sm text-gray-600 mb-2">{tran}</p>}
+            {tran && <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{tran}</p>}
             {
                 question.img ?
                     <img className="mt-6 rounded-sm" src={question.img} alt={question.text}/>

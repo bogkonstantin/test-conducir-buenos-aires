@@ -27,14 +27,14 @@ const Status = () => {
     const percent = result ? Math.round(result.probability * 100) : 0;
 
     return (
-        <div style={{ padding: '16px', border: '1px solid #eee', borderRadius: '8px', width: '250px', textAlign: 'center' }}>
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg text-center p-4" style={{ width: '250px' }}>
             <h3>Exam readiness{category ? ` · Category ${category}` : ''}</h3>
             <p>
                 <strong style={{ fontSize: '1.75rem' }}>{percent}%</strong>
                 <br />
                 likely to pass right now
             </p>
-            <div style={{ background: '#f0f0f0', borderRadius: '4px', height: '16px', width: '100%', marginTop: '8px' }}>
+            <div className="bg-gray-200 dark:bg-gray-700 rounded mt-2" style={{ height: '16px', width: '100%' }}>
                 <div
                     style={{
                         width: `${percent}%`,
@@ -46,7 +46,7 @@ const Status = () => {
                 />
             </div>
             {result && (
-                <p className="text-xs text-gray-500" style={{ marginTop: '8px' }}>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                     Mastered {result.mastered}/{result.total} · seen {Math.round(result.coverage * 100)}%
                 </p>
             )}

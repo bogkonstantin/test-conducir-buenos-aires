@@ -126,7 +126,7 @@ const Exam = ({ questions }) => {
                     </button>
                     <Link
                         to="/"
-                        className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded">
+                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
                         Home
                     </Link>
                 </div>
@@ -141,7 +141,7 @@ const Exam = ({ questions }) => {
                                 const chosen = answers[pos] != null ? q.responses[answers[pos]] : null;
                                 const correctTran = translate(correct, locale);
                                 return (
-                                    <li key={pos} className="mb-6 border-b border-gray-100 pb-4">
+                                    <li key={pos} className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
                                         <p className="text-base mb-2">{q.text}</p>
                                         {q.img && <img className="mb-2 rounded-sm max-h-48" src={q.img} alt={q.text} />}
                                         <p className="text-sm text-green-700">✓ {correct.text}</p>
@@ -169,7 +169,7 @@ const Exam = ({ questions }) => {
                 <span className="text-sm text-gray-500">
                     Question {current + 1} / {ids.length}
                 </span>
-                <span className={`text-sm font-mono ${remaining <= 60 ? "text-red-600" : "text-gray-700"}`}>
+                <span className={`text-sm font-mono ${remaining <= 60 ? "text-red-600" : "text-gray-700 dark:text-gray-300"}`}>
                     ⏱ {formatTime(remaining)}
                 </span>
             </div>
@@ -188,7 +188,7 @@ const Exam = ({ questions }) => {
                 <button
                     onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                     disabled={current === 0}
-                    className={`font-bold py-2 px-4 rounded ${current === 0 ? "bg-gray-100 text-gray-400" : "bg-gray-100 hover:bg-gray-200 text-black"}`}>
+                    className={`font-bold py-2 px-4 rounded ${current === 0 ? "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600" : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"}`}>
                     Back
                 </button>
 
@@ -203,7 +203,7 @@ const Exam = ({ questions }) => {
                 ) : (
                     <button
                         onClick={() => setCurrent((c) => Math.min(ids.length - 1, c + 1))}
-                        className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded">
+                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
                         Next
                     </button>
                 )}

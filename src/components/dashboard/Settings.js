@@ -55,6 +55,7 @@ function Settings() {
                         value={language}
                         onChange={handleLanguageChange}
                         style={{ marginLeft: 8 }}
+                        className="dark:bg-gray-800 dark:text-gray-100 rounded"
                     >
                         <option value="" disabled>
                             {language === 'ru' ? 'Выберите язык' : 'Select language'}
@@ -71,7 +72,7 @@ function Settings() {
                     <select
                         value={category}
                         onChange={handleCategoryChange}
-                        className="border rounded px-2 py-1"
+                        className="border rounded px-2 py-1 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
                     >
                         {
                             getCategories().map(cat => (
@@ -90,13 +91,13 @@ function Settings() {
                     <button
                         type="button"
                         onClick={handleExport}
-                        className="text-sm bg-gray-100 hover:bg-gray-200 text-black py-1 px-3 rounded">
+                        className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black py-1 px-3 rounded">
                         {language === 'ru' ? 'Экспорт' : 'Export'}
                     </button>
                     <button
                         type="button"
                         onClick={() => fileInput.current && fileInput.current.click()}
-                        className="text-sm bg-gray-100 hover:bg-gray-200 text-black py-1 px-3 rounded">
+                        className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black py-1 px-3 rounded">
                         {language === 'ru' ? 'Импорт' : 'Import'}
                     </button>
                     <input

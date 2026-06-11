@@ -6,10 +6,10 @@ const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
         <ul className="mt-6">
             {responses.map(
                 (answer, index) => {
-                    let color = "text-gray-900";
+                    let color = "text-gray-900 dark:text-gray-100";
                     if (isAnswered) {
                         if (answer.correct) {
-                            color = "text-green-700";
+                            color = "text-green-700 dark:text-green-400";
                         }
                     }
                     const tran = translate(answer, language);
@@ -27,7 +27,7 @@ const Answers = ({responses, language, isAnswered, selected, onSelect}) => {
                                 <label htmlFor={`default-radio-${index}`}
                                        className={`ml-3 ms-2 text-sm font-medium ${color}`}>{answer.text}</label>
                             </div>
-                            {tran && <p className="text-sm mb-6 text-gray-600">{tran}</p>}
+                            {tran && <p className="text-sm mb-6 text-gray-600 dark:text-gray-400">{tran}</p>}
                         </li>
                     );
                 })
