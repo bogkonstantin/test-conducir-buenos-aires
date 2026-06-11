@@ -6,6 +6,7 @@ import ControlButtons from "../ControlButtons";
 import { getLanguageFromStorage } from "../../lib/language";
 import { normalizeLocale } from "../../lib/i18n";
 import { update as updateMastery } from "../../lib/mastery";
+import { pickWeak } from "../../lib/selection";
 
 const Test = ({questions, postfix}) => {
 
@@ -116,7 +117,7 @@ const Test = ({questions, postfix}) => {
                             }}
 
                             onNext={() => {
-                                const index = state.queue.length ? state.queue[Math.floor(Math.random() * state.queue.length)] : null;
+                                const index = pickWeak(state.queue, questions, state.mastery, Date.now());
                                 updateState({
                                     index: index,
                                     selectedAnswer: null,

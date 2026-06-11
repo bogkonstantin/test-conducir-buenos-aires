@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Link } from "gatsby"
 import Test from "./Test";
 import Container from "../Container";
 import { getQuestions } from "../../lib/questions";
@@ -11,10 +12,10 @@ const TestWrapper = ({ category }) => {
     const questions = getQuestions(category);
     return <>
         <Container>
-            <div>
-                <h1>Test Conducir Buenos Aires, Category {category.toUpperCase()}</h1>
+            <div className="flex flex-row items-center justify-between mb-6">
+                <h1 className="text-xl font-bold">Practice · Category {category.toUpperCase()}</h1>
+                <Link to="/" className="text-sm text-gray-500 hover:text-gray-700">← Home</Link>
             </div>
-            <br />
             <Test questions={questions} postfix={postfixFor(category)}></Test>
         </Container>
     </>;
@@ -22,4 +23,4 @@ const TestWrapper = ({ category }) => {
 
 export default TestWrapper
 
-export const Head = () => <title>Test Conducir Buenos Aires, Category {categoryHead}</title>
+export const Head = () => <title>Practice · Category {categoryHead}</title>

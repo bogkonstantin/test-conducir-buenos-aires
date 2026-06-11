@@ -7,4 +7,19 @@ const EXAM = {
     timeLimitMin: 45,  // total time limit, minutes
 };
 
-module.exports = { EXAM };
+// Draw `n` distinct question indices at random from a pool of `total` questions.
+// Returns fewer than n only if the pool is smaller than n.
+function drawExamQuestions(total, n = EXAM.questions) {
+    const indices = Array.from({ length: total }, (_, i) => i);
+    // Partial Fisher-Yates: shuffle just the first `count` slots.
+    const count = Math.min(n, total);
+    for (let i = 0; i < count; i++) {
+        const j = i + Math.floor(Math.random() * (total - i));
+        const tmp = indices[i];
+        indices[i] = indices[j];
+        indices[j] = tmp;
+    }
+    return indices.slice(0, count);
+}
+
+module.exports = { EXAM, drawExamQuestions };
