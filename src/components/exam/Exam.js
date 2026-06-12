@@ -5,6 +5,9 @@ import Answers from "../Answers";
 import { EXAM, drawExamQuestions } from "../../lib/exam";
 import { getLanguageFromStorage } from "../../lib/language";
 import { translate } from "../../lib/i18n";
+import { recordMistake } from "../../lib/mistakes";
+import { recordAccuracy, recordStudyDay } from "../../lib/stats";
+import { recordMasteryIfPracticed } from "../../lib/progress";
 
 function formatTime(totalSeconds) {
     const m = Math.floor(totalSeconds / 60);
@@ -19,7 +22,7 @@ function correctIndex(question) {
 // A timed simulation of the real exam: EXAM.questions drawn at random,
 // EXAM.timeLimitMin to answer, Spanish only and no per-question feedback.
 // Read-only with respect to mastery — practice mode is what teaches.
-const Exam = ({ questions }) => {
+const Exam = ({ questions, category }) => {
     const [ids, setIds] = React.useState(null);
     const [startedAt, setStartedAt] = React.useState(null);
     const [answers, setAnswers] = React.useState({}); // examPosition -> responseIndex
@@ -90,6 +93,24 @@ const Exam = ({ questions }) => {
         return () => window.removeEventListener("keydown", onKey);
     }, [ids, current, finished, finish, questions]);
 
+    // On finish, record results to mistakes/accuracy/streak (and mastery if the
+    // user has a practice session going). Runs once per completed exam.
+    React.useEffect(() => {
+        if (!finished || !ids || !category) return;
+        ids.forEach((qid, pos) => {
+            const sel = answers[pos];
+            const answered = sel != null;
+            const correct = answered && questions[qid].responses[sel].correct;
+            recordMistake(category, qid, correct);
+            if (answered) {
+                recordAccuracy(category, correct);
+                recordMasteryIfPracticed(category, questions[qid], qid, correct);
+            }
+        });
+        recordStudyDay();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [finished]);
+
     if (!ids) {
         return <p className="text-sm text-gray-500">Preparing exam…</p>;
     }
@@ -143,7 +164,7 @@ const Exam = ({ questions }) => {
                                 return (
                                     <li key={pos} className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
                                         <p className="text-base mb-2">{q.text}</p>
-                                        {q.img && <img className="mb-2 rounded-sm max-h-48" src={q.img} alt={q.text} />}
+                                        {q.img && <img className="mb-2 rounded-sm max-w-full h-auto max-h-48" src={q.img} alt={q.text} />}
                                         <p className="text-sm text-green-700">✓ {correct.text}</p>
                                         {correctTran && <p className="text-xs text-gray-500 mb-1">{correctTran}</p>}
                                         <p className="text-sm text-red-600">
@@ -184,7 +205,7 @@ const Exam = ({ questions }) => {
                 onSelect={(i) => setAnswers((a) => ({ ...a, [current]: i }))}
             />
 
-            <div className="flex flex-row justify-between items-center mt-10">
+            <div className="flex flex-row justify-between items-center gap-2 flex-wrap mt-10">
                 <button
                     onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                     disabled={current === 0}

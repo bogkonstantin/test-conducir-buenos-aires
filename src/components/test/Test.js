@@ -8,8 +8,10 @@ import { normalizeLocale } from "../../lib/i18n";
 import { update as updateMastery } from "../../lib/mastery";
 import { pickWeak } from "../../lib/selection";
 import { t } from "../../lib/ui";
+import { recordMistake } from "../../lib/mistakes";
+import { recordAccuracy, recordStudyDay } from "../../lib/stats";
 
-const Test = ({questions, postfix}) => {
+const Test = ({questions, postfix, category}) => {
 
     const shuffleArray = (array) => {
         return array
@@ -83,6 +85,12 @@ const Test = ({questions, postfix}) => {
 
         const mastery = {...(state.mastery || {})};
         mastery[state.index] = updateMastery(mastery[state.index], question, correct, Date.now());
+
+        if (category) {
+            recordMistake(category, state.index, correct);
+            recordAccuracy(category, correct);
+            recordStudyDay();
+        }
 
         updateState({ isAnswered: true, stat, queue, mastery });
     };

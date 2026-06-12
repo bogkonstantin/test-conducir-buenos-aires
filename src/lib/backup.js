@@ -9,6 +9,12 @@ const KEYS = [
     'state_cat_a',
     'state_cat_b',
     'state', // legacy Category-B key, kept so older backups round-trip
+    'mistakes_cat_a',
+    'mistakes_cat_b',
+    'acc_cat_a',
+    'acc_cat_b',
+    'studyStreak',
+    'theme',
 ];
 
 function exportProgress() {

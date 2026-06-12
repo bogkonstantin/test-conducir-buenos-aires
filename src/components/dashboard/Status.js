@@ -3,6 +3,7 @@ import { getCategoryFromStorage } from "../../lib/category";
 import { getQuestions } from "../../lib/questions";
 import { getProgress } from "../../lib/progress";
 import { readiness } from "../../lib/readiness";
+import { getStreak, accuracyStats } from "../../lib/stats";
 
 function barColor(percent) {
     if (percent >= 80) return '#4caf50';
@@ -10,10 +11,13 @@ function barColor(percent) {
     return '#e25c5c';
 }
 
-// Estimated probability of passing the real exam right now, for the selected category.
+// Estimated probability of passing the real exam right now, for the selected
+// category, plus a few study stats.
 const Status = () => {
     const [category, setCategory] = useState(null);
     const [result, setResult] = useState(null);
+    const [streak, setStreak] = useState(0);
+    const [acc, setAcc] = useState(null);
 
     useEffect(() => {
         const cat = getCategoryFromStorage();
@@ -22,12 +26,15 @@ const Status = () => {
         const progress = getProgress(cat);
         const mastery = (progress && progress.mastery) || {};
         setResult(readiness(getQuestions(cat), mastery));
+        setStreak(getStreak().count);
+        setAcc(accuracyStats(cat));
     }, []);
 
     const percent = result ? Math.round(result.probability * 100) : 0;
+    const toMaster = result ? result.total - result.mastered : 0;
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg text-center p-4" style={{ width: '250px' }}>
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg text-center p-4 w-full max-w-xs">
             <h3>Exam readiness{category ? ` · Category ${category}` : ''}</h3>
             <p>
                 <strong style={{ fontSize: '1.75rem' }}>{percent}%</strong>
@@ -47,9 +54,14 @@ const Status = () => {
             </div>
             {result && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Mastered {result.mastered}/{result.total} · seen {Math.round(result.coverage * 100)}%
+                    Mastered {result.mastered}/{result.total} · {toMaster} to go · seen {Math.round(result.coverage * 100)}%
                 </p>
             )}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                🔥 {streak}-day streak
+                {acc && acc.recent != null ? ` · recent ${Math.round(acc.recent * 100)}%` : ''}
+                {acc && acc.overall != null ? ` · overall ${Math.round(acc.overall * 100)}%` : ''}
+            </p>
         </div>
     );
 };

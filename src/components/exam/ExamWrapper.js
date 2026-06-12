@@ -12,7 +12,7 @@ const ExamWrapper = ({ category }) => {
     const questions = getQuestions(category);
     return (
         <Container>
-            <div className="flex flex-row items-start justify-between mb-4">
+            <div className="flex flex-row items-start justify-between gap-2 mb-4">
                 <div>
                     <h1 className="text-xl font-bold">Mock exam · Category {category.toUpperCase()}</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -21,7 +21,7 @@ const ExamWrapper = ({ category }) => {
                 </div>
                 <ThemeToggle />
             </div>
-            <Exam questions={questions} />
+            <Exam questions={questions} category={category} />
         </Container>
     );
 };
