@@ -39,9 +39,7 @@ function recordStudyDay() {
 
 const RECENT_CAP = 20;
 
-function accKey(category) {
-    return `acc_cat_${String(category).toLowerCase()}`;
-}
+const { accuracyKey: accKey } = require('./keys');
 
 function getAccuracyRaw(category) {
     try {

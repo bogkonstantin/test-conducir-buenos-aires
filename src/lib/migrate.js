@@ -74,4 +74,5 @@ function runMigrations() {
     }
 }
 
-export { runMigrations, masteryFromLegacy, SCHEMA_VERSION };
+// CommonJS so node --test can load it directly (webpack interops fine).
+module.exports = { runMigrations, masteryFromLegacy, SCHEMA_VERSION };

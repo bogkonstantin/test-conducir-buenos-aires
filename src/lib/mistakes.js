@@ -4,9 +4,7 @@
 // Stored under its own key (mistakes_cat_x), separate from practice state, so any
 // mode can update it without risk to the practice progress object.
 
-function key(category) {
-    return `mistakes_cat_${String(category).toLowerCase()}`;
-}
+const { mistakesKey: key } = require('./keys');
 
 function getMistakes(category) {
     try {

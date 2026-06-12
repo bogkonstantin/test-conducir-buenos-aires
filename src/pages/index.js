@@ -4,6 +4,7 @@ import { getStateFromStorage, saveStateToStorage } from "../lib/onboard-state";
 import LanguageSelector from "../components/onboard/LanguageSelector";
 import CategorySelector from "../components/onboard/CategorySelector";
 import Dashboard from "../components/dashboard/Dashboard";
+import { track } from "../lib/analytics";
 
 const STATE_LANGUAGE_SELECTION = 'language_selection';
 const STATE_CATEGORY_SELECTION = 'category_selection';
@@ -18,14 +19,16 @@ const IndexPage = () => {
     setState(initialState);
   }, [initialState]);
 
-  const handleLanguageSelected = (e) => {
+  const handleLanguageSelected = (language) => {
     setState(STATE_CATEGORY_SELECTION);
     saveStateToStorage(STATE_CATEGORY_SELECTION);
+    track('onboarding_language_selected', { language });
   };
 
-  const handleCategorySelected = (e) => {
+  const handleCategorySelected = (category) => {
     setState(STATE_ONBOARDING_COMPLETED);
     saveStateToStorage(STATE_ONBOARDING_COMPLETED);
+    track('onboarding_completed', { category });
   }
 
   if (state === STATE_LANGUAGE_SELECTION) {

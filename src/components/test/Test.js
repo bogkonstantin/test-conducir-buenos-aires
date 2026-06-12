@@ -10,15 +10,9 @@ import { pickWeak } from "../../lib/selection";
 import { t } from "../../lib/ui";
 import { recordMistake } from "../../lib/mistakes";
 import { recordAccuracy, recordStudyDay } from "../../lib/stats";
+import { shuffle } from "../../lib/shuffle";
 
 const Test = ({questions, postfix, category}) => {
-
-    const shuffleArray = (array) => {
-        return array
-            .map(value => ({value, sort: Math.random()}))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({value}) => value)
-    }
 
     const getInitialState = () => {
         return {
@@ -31,7 +25,7 @@ const Test = ({questions, postfix, category}) => {
                 total: questions.length,
             },
             mastery: {},
-            queue: shuffleArray(Object.keys(questions)),
+            queue: shuffle(Object.keys(questions)),
         };
     }
 

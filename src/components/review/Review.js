@@ -9,6 +9,7 @@ import { recordMasteryIfPracticed } from "../../lib/progress";
 import { getLanguageFromStorage } from "../../lib/language";
 import { normalizeLocale } from "../../lib/i18n";
 import { t } from "../../lib/ui";
+import { track } from "../../lib/analytics";
 
 const homeBtn =
     "inline-block bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded";
@@ -24,7 +25,9 @@ const Review = ({ questions, category }) => {
     const language = normalizeLocale(getLanguageFromStorage());
 
     React.useEffect(() => {
-        setIds(getMistakes(category));
+        const mistakes = getMistakes(category);
+        setIds(mistakes);
+        if (mistakes.length > 0) track('review_started', { category, count: mistakes.length });
     }, [category]);
 
     const handleSelect = (i) => {
@@ -66,14 +69,14 @@ const Review = ({ questions, category }) => {
     });
 
     if (!ids) {
-        return <p className="text-sm text-gray-500 dark:text-gray-400">Loading…</p>;
+        return <p className="text-sm text-gray-500 dark:text-gray-400">{t("loading")}</p>;
     }
 
     if (ids.length === 0) {
         return (
             <div>
-                <p className="mb-5">No mistakes to review. 🎉</p>
-                <Link to="/" className={homeBtn}>Home</Link>
+                <p className="mb-5">{t("noMistakes")}</p>
+                <Link to="/" className={homeBtn}>{t("home")}</Link>
             </div>
         );
     }
@@ -81,11 +84,11 @@ const Review = ({ questions, category }) => {
     if (pos >= ids.length) {
         return (
             <div>
-                <p className="mb-2">Review complete.</p>
+                <p className="mb-2">{t("reviewComplete")}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-                    Cleared {cleared} of {ids.length}.
+                    {t("cleared").replace("{n}", cleared).replace("{total}", ids.length)}
                 </p>
-                <Link to="/" className={homeBtn}>Home</Link>
+                <Link to="/" className={homeBtn}>{t("home")}</Link>
             </div>
         );
     }

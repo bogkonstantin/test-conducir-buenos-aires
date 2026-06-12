@@ -1,10 +1,7 @@
 import * as React from "react"
-import ReviewWrapper, { Head } from "../components/review/ReviewWrapper";
+import ModeWrapper, { makeHead } from "../components/ModeWrapper";
 
-const ReviewAPage = () => {
-    return <ReviewWrapper category="A" />;
-}
+const Page = () => <ModeWrapper mode="review" category="A" />;
 
-export default ReviewAPage
-
-export { Head }
+export default Page
+export const Head = makeHead("review", "A");

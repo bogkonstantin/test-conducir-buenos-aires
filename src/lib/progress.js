@@ -1,4 +1,5 @@
 import { update as updateMastery } from "./mastery";
+import { catSuffix } from "./keys";
 
 function getKey(postfix) {
     return `state${postfix}`;
@@ -6,7 +7,7 @@ function getKey(postfix) {
 
 // The per-category storage suffix. Category B progress lives at `state_cat_b`, etc.
 function postfixFor(category) {
-    return `_cat_${String(category).toLowerCase()}`;
+    return catSuffix(category);
 }
 
 // Parsed progress object for a category, or null if absent/unreadable.

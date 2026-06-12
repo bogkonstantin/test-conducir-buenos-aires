@@ -1,10 +1,7 @@
 import * as React from "react"
-import ExamWrapper, { Head } from "../components/exam/ExamWrapper";
+import ModeWrapper, { makeHead } from "../components/ModeWrapper";
 
-const ExamBPage = () => {
-    return <ExamWrapper category="B" />;
-}
+const Page = () => <ModeWrapper mode="exam" category="B" />;
 
-export default ExamBPage
-
-export { Head }
+export default Page
+export const Head = makeHead("exam", "B");

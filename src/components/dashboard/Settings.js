@@ -1,21 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { getLanguageFromStorage, saveLanguageToStorage, getLanguages } from "../../lib/language";
-import { getCategoryFromStorage, saveCategoryToStorage, getCategories } from "../../lib/category";
+import { getCategories } from "../../lib/category";
 import { exportProgress, importProgress } from "../../lib/backup";
+import { track } from "../../lib/analytics";
+import { t } from "../../lib/ui";
 
-function Settings() {
+// Category selection is owned by Dashboard (it drives Status and the mode
+// links); language is local because only this component and t() consume it.
+function Settings({ category, onCategoryChange }) {
     const [language, setLanguage] = useState(getLanguageFromStorage() || 'en');
-    const [category, setCategory] = React.useState(getCategoryFromStorage() || "A");
     const fileInput = useRef(null);
 
     const handleLanguageChange = (e) => {
-        setLanguage(e.target.value);
         saveLanguageToStorage(e.target.value);
-    };
-
-    const handleCategoryChange = (e) => {
-        setCategory(e.target.value);
-        saveCategoryToStorage(e.target.value);
+        setLanguage(e.target.value);
     };
 
     const handleExport = () => {
@@ -26,6 +24,7 @@ function Settings() {
         a.download = 'driving-test-progress.json';
         a.click();
         URL.revokeObjectURL(url);
+        track('progress_exported');
     };
 
     const handleImport = (e) => {
@@ -34,10 +33,14 @@ function Settings() {
         const reader = new FileReader();
         reader.onload = () => {
             try {
-                importProgress(reader.result);
+                const { skipped } = importProgress(reader.result);
+                track('progress_imported', { skipped: skipped.length });
+                if (skipped.length > 0) {
+                    window.alert(t('importSkipped') + skipped.join(', '));
+                }
                 window.location.reload();
             } catch (err) {
-                window.alert((language === 'ru' ? 'Не удалось импортировать: ' : 'Could not import: ') + err.message);
+                window.alert(t('importFailed') + err.message);
             }
         };
         reader.readAsText(file);
@@ -46,10 +49,10 @@ function Settings() {
 
     return (
         <div style={{ maxWidth: 400, margin: '2rem auto', padding: 20 }}>
-            <h2 className=''>{language === 'ru' ? 'Параметры' : 'Setting'}</h2>
+            <h2 className=''>{t('settings')}</h2>
             <div>
                 <label className="block mb-1 font-medium" htmlFor="language-select">
-                    {language === 'ru' ? 'Язык:' : 'Language:'}
+                    {t('language')}
                     <select
                         id="language-select"
                         value={language}
@@ -58,7 +61,7 @@ function Settings() {
                         className="dark:bg-gray-800 dark:text-gray-100 rounded"
                     >
                         <option value="" disabled>
-                            {language === 'ru' ? 'Выберите язык' : 'Select language'}
+                            {t('selectLanguage')}
                         </option>
                         {getLanguages().map(lang => (
                             <option key={lang.code} value={lang.code}>{lang.label}</option>
@@ -68,15 +71,15 @@ function Settings() {
             </div>
             <div>
                 <label className="block mb-1 font-medium">
-                    {language === 'ru' ? 'Категория теста:' : 'Test Category:'}
+                    {t('testCategory')}
                     <select
                         value={category}
-                        onChange={handleCategoryChange}
+                        onChange={(e) => onCategoryChange(e.target.value)}
                         className="border rounded px-2 py-1 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
                     >
                         {
                             getCategories().map(cat => (
-                                <option key={cat.code} value={cat.code}>{cat.label[language]}</option>
+                                <option key={cat.code} value={cat.code}>{cat.label[language] || cat.label.en}</option>
                             ))
                         }
                     </select>
@@ -85,20 +88,20 @@ function Settings() {
 
             <div className="mt-6">
                 <span className="block mb-1 font-medium">
-                    {language === 'ru' ? 'Прогресс:' : 'Progress:'}
+                    {t('progress')}
                 </span>
                 <div className="flex flex-row gap-2">
                     <button
                         type="button"
                         onClick={handleExport}
                         className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black py-1 px-3 rounded">
-                        {language === 'ru' ? 'Экспорт' : 'Export'}
+                        {t('export')}
                     </button>
                     <button
                         type="button"
                         onClick={() => fileInput.current && fileInput.current.click()}
                         className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black py-1 px-3 rounded">
-                        {language === 'ru' ? 'Импорт' : 'Import'}
+                        {t('import')}
                     </button>
                     <input
                         ref={fileInput}

@@ -5,9 +5,11 @@ import Answers from "../Answers";
 import { EXAM, drawExamQuestions } from "../../lib/exam";
 import { getLanguageFromStorage } from "../../lib/language";
 import { translate } from "../../lib/i18n";
+import { t } from "../../lib/ui";
 import { recordMistake } from "../../lib/mistakes";
 import { recordAccuracy, recordStudyDay } from "../../lib/stats";
 import { recordMasteryIfPracticed } from "../../lib/progress";
+import { track } from "../../lib/analytics";
 
 function formatTime(totalSeconds) {
     const m = Math.floor(totalSeconds / 60);
@@ -41,7 +43,8 @@ const Exam = ({ questions, category }) => {
         setFinished(false);
         setTimedOut(false);
         setStartedAt(Date.now());
-    }, [questions.length]);
+        track('exam_started', { category });
+    }, [questions.length, category]);
 
     // Draw the exam once, on the client (avoids an SSR/hydration mismatch).
     React.useEffect(() => {
@@ -97,10 +100,12 @@ const Exam = ({ questions, category }) => {
     // user has a practice session going). Runs once per completed exam.
     React.useEffect(() => {
         if (!finished || !ids || !category) return;
+        let score = 0;
         ids.forEach((qid, pos) => {
             const sel = answers[pos];
             const answered = sel != null;
             const correct = answered && questions[qid].responses[sel].correct;
+            if (correct) score++;
             recordMistake(category, qid, correct);
             if (answered) {
                 recordAccuracy(category, correct);
@@ -108,11 +113,18 @@ const Exam = ({ questions, category }) => {
             }
         });
         recordStudyDay();
+        track('exam_finished', {
+            category,
+            score,
+            total: ids.length,
+            passed: score >= EXAM.passCorrect,
+            timed_out: timedOut,
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [finished]);
 
     if (!ids) {
-        return <p className="text-sm text-gray-500">Preparing exam…</p>;
+        return <p className="text-sm text-gray-500">{t("preparingExam")}</p>;
     }
 
     const answeredCount = Object.keys(answers).length;
@@ -127,34 +139,34 @@ const Exam = ({ questions, category }) => {
 
         return (
             <div>
-                <h1 className="text-2xl font-bold mb-2">{passed ? "✅ Passed" : "❌ Not passed"}</h1>
+                <h1 className="text-2xl font-bold mb-2">{passed ? `✅ ${t("passed")}` : `❌ ${t("notPassed")}`}</h1>
                 <p className="text-lg mb-1">
-                    <strong>{score}</strong> / {EXAM.questions} correct
-                    <span className="text-gray-500 text-sm"> (need {EXAM.passCorrect})</span>
+                    <strong>{score}</strong> / {EXAM.questions} {t("correctLabel")}
+                    <span className="text-gray-500 text-sm"> ({t("need")} {EXAM.passCorrect})</span>
                 </p>
-                {timedOut && <p className="text-sm text-red-600 mb-1">Time expired before you finished.</p>}
+                {timedOut && <p className="text-sm text-red-600 mb-1">{t("timeExpired")}</p>}
                 <p className="text-sm text-gray-600 mb-6">
                     {passed
-                        ? "You'd likely pass the real exam. Keep practicing to stay sharp."
-                        : `You may miss at most ${EXAM.maxWrong}. Review the misses below and keep practicing.`}
+                        ? t("examPassMsg")
+                        : t("examFailMsg").replace("{n}", EXAM.maxWrong)}
                 </p>
 
                 <div className="flex flex-row gap-3 mb-8">
                     <button
                         onClick={start}
                         className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
-                        Retake exam
+                        {t("retakeExam")}
                     </button>
                     <Link
                         to="/"
                         className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
-                        Home
+                        {t("home")}
                     </Link>
                 </div>
 
                 {wrong.length > 0 && (
                     <>
-                        <h2 className="text-lg font-semibold mb-4">Review ({wrong.length})</h2>
+                        <h2 className="text-lg font-semibold mb-4">{t("review")} ({wrong.length})</h2>
                         <ul>
                             {wrong.map(({ qid, pos }) => {
                                 const q = questions[qid];
@@ -168,7 +180,7 @@ const Exam = ({ questions, category }) => {
                                         <p className="text-sm text-green-700">✓ {correct.text}</p>
                                         {correctTran && <p className="text-xs text-gray-500 mb-1">{correctTran}</p>}
                                         <p className="text-sm text-red-600">
-                                            ✗ {chosen ? chosen.text : "(no answer)"}
+                                            ✗ {chosen ? chosen.text : t("noAnswer")}
                                         </p>
                                     </li>
                                 );
@@ -188,7 +200,7 @@ const Exam = ({ questions, category }) => {
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
                 <span className="text-sm text-gray-500">
-                    Question {current + 1} / {ids.length}
+                    {t("question")} {current + 1} / {ids.length}
                 </span>
                 <span className={`text-sm font-mono ${remaining <= 60 ? "text-red-600" : "text-gray-700 dark:text-gray-300"}`}>
                     ⏱ {formatTime(remaining)}
@@ -210,22 +222,22 @@ const Exam = ({ questions, category }) => {
                     onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                     disabled={current === 0}
                     className={`font-bold py-2 px-4 rounded ${current === 0 ? "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600" : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"}`}>
-                    Back
+                    {t("back")}
                 </button>
 
-                <span className="text-xs text-gray-400">{answeredCount} answered</span>
+                <span className="text-xs text-gray-400">{answeredCount} {t("answered")}</span>
 
                 {isLast ? (
                     <button
                         onClick={() => finish(false)}
                         className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
-                        Finish
+                        {t("finish")}
                     </button>
                 ) : (
                     <button
                         onClick={() => setCurrent((c) => Math.min(ids.length - 1, c + 1))}
                         className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
-                        Next
+                        {t("nextShort")}
                     </button>
                 )}
             </div>

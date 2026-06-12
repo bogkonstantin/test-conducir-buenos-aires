@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCategoryFromStorage } from "../../lib/category";
-import { getQuestions } from "../../lib/questions";
+import { loadQuestions } from "../../lib/questions";
 import { getProgress } from "../../lib/progress";
 import { readiness } from "../../lib/readiness";
 import { getStreak, accuracyStats } from "../../lib/stats";
@@ -13,22 +12,26 @@ function barColor(percent) {
 
 // Estimated probability of passing the real exam right now, for the selected
 // category, plus a few study stats.
-const Status = () => {
-    const [category, setCategory] = useState(null);
+const Status = ({ category }) => {
     const [result, setResult] = useState(null);
     const [streak, setStreak] = useState(0);
     const [acc, setAcc] = useState(null);
 
     useEffect(() => {
-        const cat = getCategoryFromStorage();
-        if (!cat) return;
-        setCategory(cat);
-        const progress = getProgress(cat);
-        const mastery = (progress && progress.mastery) || {};
-        setResult(readiness(getQuestions(cat), mastery));
-        setStreak(getStreak().count);
-        setAcc(accuracyStats(cat));
-    }, []);
+        if (!category) return;
+        let active = true;
+        loadQuestions(category).then((questions) => {
+            if (!active) return;
+            const progress = getProgress(category);
+            const mastery = (progress && progress.mastery) || {};
+            setResult(readiness(questions, mastery));
+            setStreak(getStreak().count);
+            setAcc(accuracyStats(category));
+        });
+        return () => {
+            active = false;
+        };
+    }, [category]);
 
     const percent = result ? Math.round(result.probability * 100) : 0;
     const toMaster = result ? result.total - result.mastered : 0;
