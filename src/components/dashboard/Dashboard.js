@@ -4,6 +4,7 @@ import Status from "./Status";
 import Settings from "./Settings";
 import ThemeToggle from "../ThemeToggle";
 import { getCategoryFromStorage, saveCategoryToStorage } from "../../lib/category";
+import { getLanguageFromStorage, saveLanguageToStorage } from "../../lib/language";
 import { mistakeCount } from "../../lib/mistakes";
 import { track } from "../../lib/analytics";
 import { t } from "../../lib/ui";
@@ -14,12 +15,20 @@ const { version } = require("../../../package.json");
 
 const Dashboard = () => {
     const [category, setCategory] = useState(getCategoryFromStorage() || "A");
+    const [language, setLanguage] = useState(getLanguageFromStorage() || "en");
     const [mistakes, setMistakes] = useState(0);
     const [copied, setCopied] = useState(false);
 
     const handleCategoryChange = (cat) => {
         saveCategoryToStorage(cat);
         setCategory(cat);
+    };
+
+    // Owned here (not in Settings) so the whole dashboard re-renders on change —
+    // the mode-link labels below read the locale via t().
+    const handleLanguageChange = (lang) => {
+        saveLanguageToStorage(lang);
+        setLanguage(lang);
     };
 
     // Native share sheet on mobile; copy-to-clipboard fallback on desktop.
@@ -69,6 +78,12 @@ const Dashboard = () => {
                 </Link>
                 <Link
                     to={`/exam-${catPath}`}
+                    onClick={() => {
+                        // Starting from the dashboard always means a fresh exam; the
+                        // exam screen consumes this flag, so a reload (no flag) can
+                        // instead offer to resume.
+                        try { sessionStorage.setItem('examFresh', category); } catch (e) { /* ignore */ }
+                    }}
                     className="text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-3 px-4 rounded">
                     {t('mockExam')}
                 </Link>
@@ -81,33 +96,33 @@ const Dashboard = () => {
                 )}
             </div>
 
-            <Settings category={category} onCategoryChange={handleCategoryChange} />
+            <Settings
+                category={category}
+                onCategoryChange={handleCategoryChange}
+                language={language}
+                onLanguageChange={handleLanguageChange}
+            />
 
             <footer className="mt-4 mb-6 text-xs text-gray-400 dark:text-gray-500 text-center">
                 <p className="mb-2">{t('disclaimer')}</p>
-                <button
-                    type="button"
-                    onClick={handleShare}
-                    className="hover:text-gray-600 dark:hover:text-gray-300 underline">
-                    {copied ? t('linkCopied') : `${t('share')} 📤`}
-                </button>
-                <span> · </span>
-                <a
-                    href={REPO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-gray-600 dark:hover:text-gray-300 underline">
-                    Open source on GitHub ⭐
-                </a>
-                <span> · </span>
-                <a
-                    href="https://bogomolov.tech"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-gray-600 dark:hover:text-gray-300 underline">
-                    bogomolov.tech
-                </a>
-                <span> · v{version}</span>
+                <p className="mb-1">
+                    <button
+                        type="button"
+                        onClick={handleShare}
+                        className="hover:text-gray-600 dark:hover:text-gray-300 underline">
+                        {copied ? t('linkCopied') : `${t('share')} 📤`}
+                    </button>
+                </p>
+                <p>
+                    <a
+                        href={REPO_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-gray-600 dark:hover:text-gray-300 underline">
+                        GitHub ⭐
+                    </a>
+                    <span> · v{version}</span>
+                </p>
             </footer>
         </div>
     );

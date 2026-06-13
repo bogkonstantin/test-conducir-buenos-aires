@@ -1,5 +1,8 @@
 import { update as updateMastery } from "./mastery";
 import { catSuffix } from "./keys";
+import { shuffle } from "./shuffle";
+import { getLanguageFromStorage } from "./language";
+import { normalizeLocale } from "./i18n";
 
 function getKey(postfix) {
     return `state${postfix}`;
@@ -32,6 +35,34 @@ function recordMasteryIfPracticed(category, question, id, correct, now = Date.no
     saveProgressToStorage(postfixFor(category), JSON.stringify(state));
 }
 
+// A fresh practice state, matching Test.js's getInitialState — the only store
+// for mastery is the practice state, so seeding one lets other modes contribute.
+function initialState(questions) {
+    return {
+        index: 0,
+        language: normalizeLocale(getLanguageFromStorage()),
+        selectedAnswer: null,
+        isAnswered: false,
+        stat: { questions: {}, total: questions.length },
+        mastery: {},
+        queue: shuffle(Object.keys(questions)),
+    };
+}
+
+// Like recordMasteryIfPracticed, but seeds a full practice state when none
+// exists yet. Used by the mock exam so its answers always feed readiness
+// (seen/mastered), not only for users who already opened practice. `questions`
+// is the full category array (needed to build the initial queue).
+function recordMastery(category, questions, question, id, correct, now = Date.now()) {
+    let state = getProgress(category);
+    if (!state || !Array.isArray(state.queue)) {
+        state = initialState(questions);
+    }
+    state.mastery = state.mastery || {};
+    state.mastery[id] = updateMastery(state.mastery[id], question, correct, now);
+    saveProgressToStorage(postfixFor(category), JSON.stringify(state));
+}
+
 function getProgressFromStorage(postfix) {
     const key = getKey(postfix);
 
@@ -54,4 +85,4 @@ function saveProgressToStorage(postfix, progress) {
     }
 }
 
-export { getProgressFromStorage, saveProgressToStorage, postfixFor, getProgress, recordMasteryIfPracticed };
+export { getProgressFromStorage, saveProgressToStorage, postfixFor, getProgress, recordMasteryIfPracticed, recordMastery };

@@ -8,7 +8,8 @@ import { translate } from "../../lib/i18n";
 import { t } from "../../lib/ui";
 import { recordMistake } from "../../lib/mistakes";
 import { recordAccuracy, recordStudyDay } from "../../lib/stats";
-import { recordMasteryIfPracticed } from "../../lib/progress";
+import { recordMastery } from "../../lib/progress";
+import * as session from "../../lib/exam-session";
 import { track } from "../../lib/analytics";
 
 function formatTime(totalSeconds) {
@@ -32,10 +33,13 @@ const Exam = ({ questions, category }) => {
     const [remaining, setRemaining] = React.useState(EXAM.timeLimitMin * 60);
     const [finished, setFinished] = React.useState(false);
     const [timedOut, setTimedOut] = React.useState(false);
+    const [resume, setResume] = React.useState(null); // saved session awaiting a continue/start-over decision
     const finishedRef = React.useRef(false);
 
     const start = React.useCallback(() => {
         finishedRef.current = false;
+        setResume(null);
+        session.clear(category);
         setIds(drawExamQuestions(questions.length, EXAM.questions));
         setAnswers({});
         setCurrent(0);
@@ -46,10 +50,48 @@ const Exam = ({ questions, category }) => {
         track('exam_started', { category });
     }, [questions.length, category]);
 
-    // Draw the exam once, on the client (avoids an SSR/hydration mismatch).
+    // Restore an in-progress session (after an accidental reload).
+    const continueExam = React.useCallback(() => {
+        const s = resume;
+        if (!s) return;
+        finishedRef.current = false;
+        setIds(s.ids);
+        setAnswers(s.answers || {});
+        setCurrent(s.current || 0);
+        setStartedAt(s.startedAt);
+        setRemaining(Math.max(0, session.remainingFor(s)));
+        setFinished(false);
+        setTimedOut(false);
+        setResume(null);
+    }, [resume]);
+
+    // On mount, decide: start fresh (opened from the dashboard, which sets a
+    // one-shot flag), or — on a reload, where the flag is absent — offer to
+    // resume a still-valid saved session. Runs once on the client (also avoids an
+    // SSR/hydration mismatch from drawing questions during render).
     React.useEffect(() => {
+        let fresh = false;
+        try {
+            fresh = sessionStorage.getItem('examFresh') === category;
+            if (fresh) sessionStorage.removeItem('examFresh');
+        } catch (e) {
+            // sessionStorage unavailable — treat as fresh
+        }
+        if (!fresh) {
+            const saved = session.load(category);
+            if (saved && session.remainingFor(saved) > 0) {
+                setResume(saved);
+                return;
+            }
+        }
         start();
-    }, [start]);
+    }, [start, category]);
+
+    // Persist the in-progress session so a reload can resume it.
+    React.useEffect(() => {
+        if (!ids || finished || !startedAt) return;
+        session.save(category, { ids, answers, current, startedAt });
+    }, [ids, answers, current, startedAt, finished, category]);
 
     const finish = React.useCallback((dueToTimeout = false) => {
         if (finishedRef.current) return;
@@ -100,6 +142,7 @@ const Exam = ({ questions, category }) => {
     // user has a practice session going). Runs once per completed exam.
     React.useEffect(() => {
         if (!finished || !ids || !category) return;
+        session.clear(category);
         let score = 0;
         ids.forEach((qid, pos) => {
             const sel = answers[pos];
@@ -109,7 +152,7 @@ const Exam = ({ questions, category }) => {
             recordMistake(category, qid, correct);
             if (answered) {
                 recordAccuracy(category, correct);
-                recordMasteryIfPracticed(category, questions[qid], qid, correct);
+                recordMastery(category, questions, questions[qid], qid, correct);
             }
         });
         recordStudyDay();
@@ -122,6 +165,31 @@ const Exam = ({ questions, category }) => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [finished]);
+
+    if (resume) {
+        const savedAnswered = Object.keys(resume.answers || {}).length;
+        const left = Math.max(0, session.remainingFor(resume));
+        return (
+            <div>
+                <h1 className="text-xl font-bold mb-2">{t("examInProgress")}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    {savedAnswered} {t("answered")} · ⏱ {formatTime(left)}
+                </p>
+                <div className="flex flex-row gap-3">
+                    <button
+                        onClick={continueExam}
+                        className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
+                        {t("continueExam")}
+                    </button>
+                    <button
+                        onClick={start}
+                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
+                        {t("startOver")}
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (!ids) {
         return <p className="text-sm text-gray-500">{t("preparingExam")}</p>;
@@ -172,10 +240,12 @@ const Exam = ({ questions, category }) => {
                                 const q = questions[qid];
                                 const correct = q.responses[correctIndex(q)];
                                 const chosen = answers[pos] != null ? q.responses[answers[pos]] : null;
+                                const qTran = translate(q, locale);
                                 const correctTran = translate(correct, locale);
                                 return (
                                     <li key={pos} className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
-                                        <p className="text-base mb-2">{q.text}</p>
+                                        <p className="text-base mb-1">{q.text}</p>
+                                        {qTran && <p className="text-xs text-gray-500 mb-2">{qTran}</p>}
                                         {q.img && <img className="mb-2 rounded-sm max-w-full h-auto max-h-48" src={q.img} alt={q.text} />}
                                         <p className="text-sm text-green-700">✓ {correct.text}</p>
                                         {correctTran && <p className="text-xs text-gray-500 mb-1">{correctTran}</p>}

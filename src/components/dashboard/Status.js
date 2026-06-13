@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { loadQuestions } from "../../lib/questions";
 import { getProgress } from "../../lib/progress";
 import { readiness } from "../../lib/readiness";
-import { getStreak, accuracyStats } from "../../lib/stats";
+import { accuracyStats } from "../../lib/stats";
+import { t } from "../../lib/ui";
 
 function barColor(percent) {
     if (percent >= 80) return '#4caf50';
@@ -14,7 +15,6 @@ function barColor(percent) {
 // category, plus a few study stats.
 const Status = ({ category }) => {
     const [result, setResult] = useState(null);
-    const [streak, setStreak] = useState(0);
     const [acc, setAcc] = useState(null);
 
     useEffect(() => {
@@ -25,7 +25,6 @@ const Status = ({ category }) => {
             const progress = getProgress(category);
             const mastery = (progress && progress.mastery) || {};
             setResult(readiness(questions, mastery));
-            setStreak(getStreak().count);
             setAcc(accuracyStats(category));
         });
         return () => {
@@ -38,11 +37,11 @@ const Status = ({ category }) => {
 
     return (
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg text-center p-4 w-full max-w-xs">
-            <h3>Exam readiness{category ? ` · Category ${category}` : ''}</h3>
+            <h3>{t("examReadiness")}{category ? ` · ${t("category")} ${category}` : ''}</h3>
             <p>
                 <strong style={{ fontSize: '1.75rem' }}>{percent}%</strong>
                 <br />
-                likely to pass right now
+                {t("likelyToPass")}
             </p>
             <div className="bg-gray-200 dark:bg-gray-700 rounded mt-2" style={{ height: '16px', width: '100%' }}>
                 <div
@@ -57,14 +56,16 @@ const Status = ({ category }) => {
             </div>
             {result && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Mastered {result.mastered}/{result.total} · {toMaster} to go · seen {Math.round(result.coverage * 100)}%
+                    {t("masteredStat")} {result.mastered}/{result.total} · {toMaster} {t("toGo")} · {t("seen")} {Math.round(result.coverage * 100)}%
                 </p>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                🔥 {streak}-day streak
-                {acc && acc.recent != null ? ` · recent ${Math.round(acc.recent * 100)}%` : ''}
-                {acc && acc.overall != null ? ` · overall ${Math.round(acc.overall * 100)}%` : ''}
-            </p>
+            {acc && (acc.recent != null || acc.overall != null) && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {acc.recent != null ? `${t("recentLabel")} ${Math.round(acc.recent * 100)}%` : ''}
+                    {acc.recent != null && acc.overall != null ? ' · ' : ''}
+                    {acc.overall != null ? `${t("overallLabel")} ${Math.round(acc.overall * 100)}%` : ''}
+                </p>
+            )}
         </div>
     );
 };

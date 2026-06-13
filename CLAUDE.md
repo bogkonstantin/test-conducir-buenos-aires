@@ -27,13 +27,13 @@ There is **no linter or formatter** configured (`npm run lint` doesn't exist). T
 - `components/test/Test.js` is the practice drill engine; `components/exam/Exam.js` the timed mock exam; `components/review/Review.js` the mistakes deck.
 
 ### Persistence: localStorage is the entire data layer
-There is no database or API. Every piece of state is a separate `localStorage` key. **All key names are built in `src/lib/keys.js`** — never inline a key string; `backup.js` derives its export/import surface from `keys.js`, so a key that bypasses it silently falls out of backup. Modules fronting the keys:
+There is no database or API. Every piece of state is a separate `localStorage` key. **Per-category key suffixes are built in `src/lib/keys.js`** — don't inline a `_cat_x` suffix string. Modules fronting the keys:
 - `onboard-state.js` → `onboardState`
 - `language.js` → `selectedLanguage` (`en`/`ru`), with an in-module `cachedLanguage` memo
 - `category.js` → `selectedCategory` (`A`/`B`), with an in-module `cachedCategory` memo and validation
 - `progress.js` → `state_cat_{a,b}` (practice state incl. mastery map)
 - `mistakes.js` → `mistakes_cat_{a,b}`; `stats.js` → `acc_cat_{a,b}`, `studyStreak`
-- `migrate.js` — idempotent schema migrations, run from `gatsby-browser.js` `onClientEntry` (so every entry point sees migrated data); `backup.js` — validated export/import of everything.
+- `migrate.js` — idempotent schema migrations, run from `gatsby-browser.js` `onClientEntry` (so every entry point sees migrated data).
 
 All of these are guarded with `typeof window !== 'undefined'` checks because Gatsby SSRs pages at build time — **any direct `localStorage`/`navigator` access must be guarded or deferred into `useEffect`**, or the build breaks.
 
@@ -55,7 +55,7 @@ Don't conflate them:
 - The in-test content locale (`es`/`en`/`ru`) from `lib/i18n.js` — `es` means "Spanish only, no translation" (legacy stored value `"0"` normalizes to `es`); `translate()` reads the JSON's inline `tran` fields.
 
 ### Analytics
-`gatsby-plugin-google-gtag` tracks pageviews; custom events go through `lib/analytics.js track()` (onboarding completion, exam start/finish, review start, progress export/import). Keep events coarse — no per-question events.
+`gatsby-plugin-google-gtag` tracks pageviews; custom events go through `lib/analytics.js track()` (onboarding completion, exam start/finish, review start). Keep events coarse — no per-question events.
 
 ### Styling
 Tailwind via `gatsby-plugin-postcss` + `postcss.config.js`; global directives in `src/styles/global.css` imported through `gatsby-browser.js`. `tailwind.config.js` only scans `src/pages` and `src/components`. Some components also use inline `style={{}}` objects — the codebase mixes both. Dark mode is class-based: an inline script in `gatsby-ssr.js` sets the class before paint (intentionally duplicating `lib/theme.js` logic — keep them in sync).
