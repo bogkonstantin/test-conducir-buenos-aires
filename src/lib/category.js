@@ -4,12 +4,14 @@ let cachedCategory = null;
 const getCategories = () => [
     {
         code: 'A', label: {
+            es: 'Categoría A',
             en: 'Category A',
             ru: 'Категория A'
         }
     },
     {
         code: 'B', label: {
+            es: 'Categoría B',
             en: 'Category B',
             ru: 'Категория B'
         }

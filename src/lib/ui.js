@@ -1,9 +1,67 @@
-// UI chrome strings. These follow the chosen app locale (en/ru) — distinct from
-// the per-question content locale (es/en/ru) handled by i18n.js. Spanish is a
-// content language only, so UI chrome falls back to English.
+// UI chrome strings. These follow the chosen app locale (es/en/ru) — distinct
+// from the per-question content locale (es/en/ru) handled by i18n.js. Picking
+// Spanish as the app locale also means questions show untranslated (es).
 import { getLanguageFromStorage } from "./language";
 
 const STRINGS = {
+    es: {
+        chooseCategory: "Elegí la categoría de tu examen",
+        question: "Pregunta",
+        check: "Verificar respuesta",
+        chooseAnswer: "Elegí una respuesta",
+        next: "Siguiente pregunta",
+        allLearned: "¡Aprendiste todo. Felicitaciones!",
+        reset: "Reiniciar",
+        questionsLabel: "preguntas",
+        masteredLabel: "dominadas",
+        masteredNote: "preguntas respondidas correctamente varias veces seguidas",
+        settings: "Configuración",
+        language: "Idioma:",
+        selectLanguage: "Elegí un idioma",
+        testCategory: "Categoría del examen:",
+        disclaimer: "El examen real puede diferir.",
+        share: "Compartir",
+        shareText: "Practicá para el examen teórico de la licencia de conducir de Buenos Aires:",
+        linkCopied: "¡Enlace copiado!",
+        // mode chrome + exam/review screens
+        practice: "Práctica",
+        mockExam: "Examen de práctica",
+        review: "Repaso",
+        reviewMistakes: "Repasar errores",
+        category: "Categoría",
+        home: "Inicio",
+        loading: "Cargando…",
+        min: "min",
+        passAt: "se aprueba con",
+        preparingExam: "Preparando el examen…",
+        passed: "Aprobado",
+        notPassed: "No aprobado",
+        correctLabel: "correctas",
+        need: "necesitás",
+        timeExpired: "Se acabó el tiempo antes de terminar.",
+        examPassMsg: "Probablemente aprobarías el examen real. Seguí practicando para no perder el nivel.",
+        examFailMsg: "Podés equivocarte como máximo en {n}. Revisá los errores de abajo y seguí practicando.",
+        retakeExam: "Rehacer examen",
+        examInProgress: "Tenés un examen sin terminar.",
+        continueExam: "Continuar",
+        startOver: "Empezar de nuevo",
+        noAnswer: "(sin respuesta)",
+        back: "Atrás",
+        answered: "respondidas",
+        finish: "Finalizar",
+        nextShort: "Siguiente",
+        noMistakes: "No hay errores para repasar. 🎉",
+        reviewComplete: "Repaso completado.",
+        cleared: "Resueltos {n} de {total}.",
+        // dashboard readiness status
+        examReadiness: "Preparación para el examen",
+        likelyToPass: "de probabilidad de aprobar ahora",
+        masteredStat: "Dominadas",
+        toGo: "restantes",
+        seen: "vistas",
+        recentLabel: "reciente",
+        overallLabel: "general",
+    },
     en: {
         chooseCategory: "Choose Your Test Category",
         question: "Question",
@@ -123,7 +181,8 @@ const STRINGS = {
 };
 
 function getUiLocale() {
-    return getLanguageFromStorage() === "ru" ? "ru" : "en";
+    const lang = getLanguageFromStorage();
+    return STRINGS[lang] ? lang : "en";
 }
 
 function t(key) {

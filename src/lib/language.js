@@ -3,6 +3,7 @@ let cachedLanguage = null;
 
 function getLanguages() {
     return [
+        { code: 'es', label: 'Español' },
         { code: 'en', label: 'English' },
         { code: 'ru', label: 'Русский' }
     ];
