@@ -9,6 +9,7 @@ module.exports = {
     plugins: [
         "gatsby-plugin-postcss",
         "gatsby-plugin-image",
+        "gatsby-plugin-sitemap",
         {
             resolve: "gatsby-plugin-google-gtag",
             options: {
