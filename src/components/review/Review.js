@@ -11,8 +11,7 @@ import { normalizeLocale } from "../../lib/i18n";
 import { t } from "../../lib/ui";
 import { track } from "../../lib/analytics";
 
-const homeBtn =
-    "inline-block bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded";
+const homeBtn = "btn-neutral";
 
 // Drill only the questions you've previously missed, with immediate feedback.
 // A correct answer clears the question from the mistakes set.
@@ -97,8 +96,8 @@ const Review = ({ questions, category }) => {
 
     return (
         <>
-            <div className="mb-6">
-                <h3 className="text-sm">{t("question")} {pos + 1} / {ids.length}</h3>
+            <div className="mb-7">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400 tnum">{t("question")} {pos + 1} <span className="text-gray-300 dark:text-slate-600">/</span> {ids.length}</h3>
             </div>
             <QuestionText question={question} language={language} />
             <Answers

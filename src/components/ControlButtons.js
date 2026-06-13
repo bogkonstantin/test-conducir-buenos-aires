@@ -15,18 +15,12 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
             <Container>
                 <button
                     onClick={() => onNext()}
-                    className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
+                    className="btn-primary min-w-[10rem]">
                     {t('next')}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
             </Container>
         );
-    }
-
-    let colors = 'bg-green-700 hover:bg-green-800 text-white';
-    let text = t('check');
-    if (selected === null) {
-        colors = 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-black';
-        text = t('chooseAnswer');
     }
 
     return (
@@ -34,8 +28,8 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
             <button
                 onClick={() => onAnswer()}
                 disabled={selected === null}
-                className={`${colors} font-bold py-2 px-4 rounded`}>
-                {text}
+                className="btn-primary min-w-[10rem]">
+                {selected === null ? t('chooseAnswer') : t('check')}
             </button>
         </Container>
     );

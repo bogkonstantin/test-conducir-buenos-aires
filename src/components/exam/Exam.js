@@ -171,19 +171,15 @@ const Exam = ({ questions, category }) => {
         const left = Math.max(0, session.remainingFor(resume));
         return (
             <div>
-                <h1 className="text-xl font-bold mb-2">{t("examInProgress")}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                    {savedAnswered} {t("answered")} · ⏱ {formatTime(left)}
+                <h1 className="text-xl font-bold tracking-tight mb-2 text-gray-900 dark:text-white">{t("examInProgress")}</h1>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-6 tnum">
+                    {savedAnswered} {t("answered")} · {formatTime(left)}
                 </p>
                 <div className="flex flex-row gap-3">
-                    <button
-                        onClick={continueExam}
-                        className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
+                    <button onClick={continueExam} className="btn-primary">
                         {t("continueExam")}
                     </button>
-                    <button
-                        onClick={start}
-                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
+                    <button onClick={start} className="btn-neutral">
                         {t("startOver")}
                     </button>
                 </div>
@@ -207,35 +203,33 @@ const Exam = ({ questions, category }) => {
 
         return (
             <div>
-                <h1 className="text-2xl font-bold mb-2">{passed ? `✅ ${t("passed")}` : `❌ ${t("notPassed")}`}</h1>
-                <p className="text-lg mb-1">
-                    <strong>{score}</strong> / {EXAM.questions} {t("correctLabel")}
-                    <span className="text-gray-500 text-sm"> ({t("need")} {EXAM.passCorrect})</span>
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3 ${passed ? "bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300" : "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300"}`}>
+                    {passed ? t("passed") : t("notPassed")}
+                </span>
+                <p className="font-display text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-1 tnum">
+                    {score}<span className="text-2xl text-gray-400 dark:text-slate-500"> / {EXAM.questions}</span>
                 </p>
-                {timedOut && <p className="text-sm text-red-600 mb-1">{t("timeExpired")}</p>}
-                <p className="text-sm text-gray-600 mb-6">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t("correctLabel")} · {t("need")} {EXAM.passCorrect}</p>
+                {timedOut && <p className="text-sm text-red-600 dark:text-red-400 mb-1">{t("timeExpired")}</p>}
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
                     {passed
                         ? t("examPassMsg")
                         : t("examFailMsg").replace("{n}", EXAM.maxWrong)}
                 </p>
 
                 <div className="flex flex-row gap-3 mb-8">
-                    <button
-                        onClick={start}
-                        className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
+                    <button onClick={start} className="btn-primary">
                         {t("retakeExam")}
                     </button>
-                    <Link
-                        to="/"
-                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
+                    <Link to="/" className="btn-neutral">
                         {t("home")}
                     </Link>
                 </div>
 
                 {wrong.length > 0 && (
                     <>
-                        <h2 className="text-lg font-semibold mb-4">{t("review")} ({wrong.length})</h2>
-                        <ul>
+                        <h2 className="text-lg font-bold tracking-tight mb-4 text-gray-900 dark:text-white">{t("review")} ({wrong.length})</h2>
+                        <ul className="space-y-4">
                             {wrong.map(({ qid, pos }) => {
                                 const q = questions[qid];
                                 const correct = q.responses[correctIndex(q)];
@@ -243,13 +237,13 @@ const Exam = ({ questions, category }) => {
                                 const qTran = translate(q, locale);
                                 const correctTran = translate(correct, locale);
                                 return (
-                                    <li key={pos} className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
-                                        <p className="text-base mb-1">{q.text}</p>
-                                        {qTran && <p className="text-xs text-gray-500 mb-2">{qTran}</p>}
-                                        {q.img && <img className="mb-2 rounded-sm max-w-full h-auto max-h-48" src={q.img} alt={q.text} />}
-                                        <p className="text-sm text-green-700">✓ {correct.text}</p>
-                                        {correctTran && <p className="text-xs text-gray-500 mb-1">{correctTran}</p>}
-                                        <p className="text-sm text-red-600">
+                                    <li key={pos} className="surface-inset p-4">
+                                        <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">{q.text}</p>
+                                        {qTran && <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{qTran}</p>}
+                                        {q.img && <img className="mb-3 rounded-xl max-w-full h-auto max-h-48 ring-1 ring-gray-900/5 dark:ring-white/10" src={q.img} alt={q.text} />}
+                                        <p className="text-sm font-medium text-brand-700 dark:text-brand-400">✓ {correct.text}</p>
+                                        {correctTran && <p className="text-xs text-gray-500 dark:text-slate-400 mb-1 ml-4">{correctTran}</p>}
+                                        <p className="text-sm font-medium text-red-600 dark:text-red-400 mt-1">
                                             ✗ {chosen ? chosen.text : t("noAnswer")}
                                         </p>
                                     </li>
@@ -269,11 +263,12 @@ const Exam = ({ questions, category }) => {
     return (
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
-                <span className="text-sm text-gray-500">
-                    {t("question")} {current + 1} / {ids.length}
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400 tnum">
+                    {t("question")} {current + 1} <span className="text-gray-300 dark:text-slate-600">/</span> {ids.length}
                 </span>
-                <span className={`text-sm font-mono ${remaining <= 60 ? "text-red-600" : "text-gray-700 dark:text-gray-300"}`}>
-                    ⏱ {formatTime(remaining)}
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-semibold tnum ${remaining <= 60 ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300 animate-pulse" : "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-200"}`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>
+                    {formatTime(remaining)}
                 </span>
             </div>
 
@@ -291,22 +286,20 @@ const Exam = ({ questions, category }) => {
                 <button
                     onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                     disabled={current === 0}
-                    className={`font-bold py-2 px-4 rounded ${current === 0 ? "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600" : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"}`}>
+                    className="btn-neutral py-2.5 disabled:opacity-50 disabled:hover:translate-y-0">
                     {t("back")}
                 </button>
 
-                <span className="text-xs text-gray-400">{answeredCount} {t("answered")}</span>
+                <span className="text-xs text-gray-400 dark:text-slate-500 tnum">{answeredCount} {t("answered")}</span>
 
                 {isLast ? (
-                    <button
-                        onClick={() => finish(false)}
-                        className="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
+                    <button onClick={() => finish(false)} className="btn-primary py-2.5">
                         {t("finish")}
                     </button>
                 ) : (
                     <button
                         onClick={() => setCurrent((c) => Math.min(ids.length - 1, c + 1))}
-                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-2 px-4 rounded">
+                        className="btn-neutral py-2.5">
                         {t("nextShort")}
                     </button>
                 )}

@@ -24,15 +24,15 @@ const LanguageSelector = ({ onSelect }) => {
     };
 
     return (
-        <div>
-            <label htmlFor="language-select">
-                {browserLang === 'ru' ? 'Пожалуйста, выберите язык:' : 'Please select your language:'}
+        <div className="flex flex-col items-center text-center py-4">
+            <label htmlFor="language-select" className="font-display text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-5">
+                {browserLang === 'ru' ? 'Пожалуйста, выберите язык' : 'Please select your language'}
             </label>
             <select
                 id="language-select"
                 value={selected}
                 onChange={handleChange}
-                style={{ marginLeft: 8 }}
+                className="select-field text-base w-full max-w-xs py-2.5"
             >
                 <option value="" disabled>
                     {browserLang === 'ru' ? 'Выберите язык' : 'Select language'}

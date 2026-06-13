@@ -70,10 +70,10 @@ const Dashboard = () => {
 
             <Status category={category} />
 
-            <div className="flex flex-col w-full max-w-xs gap-3 mt-6">
+            <div className="flex flex-col w-full max-w-xs gap-3 mt-7">
                 <Link
                     to={`/category-${catPath}`}
-                    className="text-center bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded">
+                    className="btn-primary w-full text-base">
                     {t('practice')}
                 </Link>
                 <Link
@@ -84,13 +84,13 @@ const Dashboard = () => {
                         // instead offer to resume.
                         try { sessionStorage.setItem('examFresh', category); } catch (e) { /* ignore */ }
                     }}
-                    className="text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 text-black font-bold py-3 px-4 rounded">
+                    className="btn-neutral w-full text-base">
                     {t('mockExam')}
                 </Link>
                 {mistakes > 0 && (
                     <Link
                         to={`/review-${catPath}`}
-                        className="text-center bg-amber-100 hover:bg-amber-200 dark:bg-amber-900 dark:hover:bg-amber-800 dark:text-amber-100 text-amber-900 font-bold py-3 px-4 rounded">
+                        className="btn-amber w-full text-base">
                         {t('reviewMistakes')} ({mistakes})
                     </Link>
                 )}
@@ -103,26 +103,26 @@ const Dashboard = () => {
                 onLanguageChange={handleLanguageChange}
             />
 
-            <footer className="mt-4 mb-6 text-xs text-gray-400 dark:text-gray-500 text-center">
-                <p className="mb-2">{t('disclaimer')}</p>
-                <p className="mb-1">
+            <footer className="mt-8 pt-5 w-full max-w-xs border-t border-gray-100 dark:border-white/10 text-xs text-gray-400 dark:text-slate-500 text-center">
+                <p className="mb-3">{t('disclaimer')}</p>
+                <div className="flex items-center justify-center gap-4">
                     <button
                         type="button"
                         onClick={handleShare}
-                        className="hover:text-gray-600 dark:hover:text-gray-300 underline">
-                        {copied ? t('linkCopied') : `${t('share')} 📤`}
+                        className="font-medium text-gray-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 transition-colors">
+                        {copied ? t('linkCopied') : t('share')}
                     </button>
-                </p>
-                <p>
+                    <span className="text-gray-300 dark:text-slate-700">·</span>
                     <a
                         href={REPO_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-gray-600 dark:hover:text-gray-300 underline">
-                        GitHub ⭐
+                        className="font-medium text-gray-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 transition-colors">
+                        GitHub
                     </a>
-                    <span> · v{version}</span>
-                </p>
+                    <span className="text-gray-300 dark:text-slate-700">·</span>
+                    <span>v{version}</span>
+                </div>
             </footer>
         </div>
     );

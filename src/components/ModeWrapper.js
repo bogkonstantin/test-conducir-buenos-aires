@@ -53,19 +53,22 @@ const ModeWrapper = ({ mode, category }) => {
 
     return (
         <Container>
-            <div className="flex flex-row items-start justify-between gap-2 mb-6">
+            <div className="flex flex-row items-start justify-between gap-2 mb-7">
                 <div>
-                    <h1 className="text-xl font-bold">{t(titleKey)} · {t("category")} {category.toUpperCase()}</h1>
-                    {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle()}</p>}
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t(titleKey)} <span className="text-gray-300 dark:text-slate-600">·</span> {t("category")} {category.toUpperCase()}</h1>
+                    {subtitle && <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 tnum">{subtitle()}</p>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                     <ThemeToggle />
-                    <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">← {t("home")}</Link>
+                    <Link to="/" className="btn-ghost gap-1.5 text-sm font-medium px-2.5">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        <span className="hidden sm:inline">{t("home")}</span>
+                    </Link>
                 </div>
             </div>
             {questions
                 ? render(questions, category)
-                : <p className="text-sm text-gray-500 dark:text-gray-400">{t("loading")}</p>}
+                : <p className="text-sm text-gray-500 dark:text-slate-400">{t("loading")}</p>}
         </Container>
     );
 };

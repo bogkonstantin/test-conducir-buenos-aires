@@ -15,17 +15,19 @@ const CategorySelector = ({ onSelect }) => {
 
     return (
         <div className="flex flex-col items-center">
-            <h1 className="text-3xl font-bold mb-6 md:mb-8 text-center">{t("chooseCategory")}</h1>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-xs md:max-w-none items-center">
+            <h1 className="text-3xl font-bold tracking-tight mb-6 md:mb-8 text-center text-gray-900 dark:text-white">{t("chooseCategory")}</h1>
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full items-stretch">
                 {
                     getCategories().map(cat => (
                         <button
                             key={cat.code}
                             type="button"
                             onClick={() => handleSelection(cat.code)}
-                            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 md:p-8 text-center hover:bg-blue-100 dark:hover:bg-gray-700 transition w-full md:w-64"
+                            className="group flex-1 surface-inset p-6 md:p-8 text-center transition-all duration-200
+                                       hover:-translate-y-1 hover:ring-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10
+                                       focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
                         >
-                            <span className="text-xl font-semibold">{cat.label[language]}</span>
+                            <span className="font-display text-2xl font-bold text-gray-900 dark:text-white group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">{cat.label[language]}</span>
                         </button>
                     ))
                 }

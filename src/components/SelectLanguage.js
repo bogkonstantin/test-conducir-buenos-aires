@@ -8,8 +8,7 @@ const SelectLanguage = ({language, onChange}) => {
             <select id="underline_select"
                     value={normalizeLocale(language)}
                     onChange={(e) => onChange(e.target.value)}
-                    style={{textAlignLast: 'right'}}
-                    className="block w-full text-sm text-gray-500 dark:text-gray-300 dark:bg-gray-800 focus:outline-none">
+                    className="select-field text-xs py-1.5">
                 {TEST_LOCALES.map(loc => (
                     <option key={loc.code} value={loc.code}>{loc.label}</option>
                 ))}
