@@ -52,7 +52,7 @@ Single source: `static/api/questions/category-{a,b}.json`, loaded **asynchronous
 
 ### Two unrelated "language" concepts
 Don't conflate them:
-- App locale (`en`/`ru`) from `lib/language.js` — drives UI chrome copy via `lib/ui.js t()`. Use `t()` for any user-facing chrome string; don't inline `language === 'ru' ? … : …` ternaries.
+- App locale (`es`/`en`/`ru`) from `lib/language.js` — drives UI chrome copy via `lib/ui.js t()`. Use `t()` for any user-facing chrome string; don't inline `language === 'ru' ? … : …` ternaries. The same stored value feeds the in-test locale below, so choosing `es` as the app locale also makes questions show untranslated.
 - The in-test content locale (`es`/`en`/`ru`) from `lib/i18n.js` — `es` means "Spanish only, no translation" (legacy stored value `"0"` normalizes to `es`); `translate()` reads the JSON's inline `tran` fields.
 
 ### Analytics
