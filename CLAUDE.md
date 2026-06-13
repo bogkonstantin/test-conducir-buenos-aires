@@ -14,8 +14,9 @@ npm run build     # production build into public/
 npm run serve     # serve the production build locally
 npm run clean     # clear Gatsby .cache and public (run this after changing gatsby-config/data)
 npm test          # node --test src/lib/  (unit tests for the lib modules)
-npm run deploy    # gatsby build --prefix-paths && gh-pages -d public  (publishes to GitHub Pages)
 ```
+
+Deployment is automatic: pushing/merging to `main` runs `.github/workflows/ci.yml`, which builds the site and publishes it to GitHub Pages (`driver.bogomolov.tech`) via the **GitHub Actions** Pages source — there is no `gh-pages` branch and no manual `npm run deploy` step.
 
 There is **no linter or formatter** configured (`npm run lint` doesn't exist). Tests run via Node's built-in runner: test files are `src/lib/*.test.js` and the modules they cover are **CommonJS** (`module.exports`) so `node --test` can load them — webpack interops fine when components `import` them. Keep new testable lib modules CommonJS. CI (`.github/workflows/ci.yml`) runs `npm test` + `npm run build` on PRs; the build is what catches SSR violations.
 
