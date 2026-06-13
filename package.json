@@ -23,6 +23,7 @@
     "gatsby-plugin-manifest": "^5.13.0",
     "gatsby-plugin-postcss": "^6.13.0",
     "gatsby-plugin-sharp": "^5.13.0",
+    "gatsby-plugin-sitemap": "^6.16.0",
     "gatsby-source-filesystem": "^5.13.0",
     "gatsby-transformer-sharp": "^5.13.0",
     "postcss": "^8.4.32",
