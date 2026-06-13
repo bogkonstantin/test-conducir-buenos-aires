@@ -1,4 +1,5 @@
 import * as React from "react";
+import { t } from "../lib/ui";
 
 const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
     const Container = ({children}) => {
@@ -14,18 +15,12 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
             <Container>
                 <button
                     onClick={() => onNext()}
-                    className="bg-gray-100 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded">
-                    Следующий вопрос
+                    className="btn-primary min-w-[10rem]">
+                    {t('next')}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
             </Container>
         );
-    }
-
-    let colors = 'bg-green-700 hover:bg-green-800 text-white';
-    let text = 'Проверить ответ';
-    if (selected === null) {
-        colors = 'bg-gray-300 hover:bg-gray-400 text-black';
-        text = 'Выберите ответ';
     }
 
     return (
@@ -33,8 +28,8 @@ const ControlButtons = ({isAnswered, selected, onAnswer, onNext}) => {
             <button
                 onClick={() => onAnswer()}
                 disabled={selected === null}
-                className={`${colors} font-bold py-2 px-4 rounded`}>
-                {text}
+                className="btn-primary min-w-[10rem]">
+                {selected === null ? t('chooseAnswer') : t('check')}
             </button>
         </Container>
     );
